@@ -1,0 +1,22 @@
+{
+  "name": "WeGA-Mirador",
+  "version": "0.1.0",
+  "description": "Dedicated Mirador image viewer for use in the WeGA-WebApp",
+  "private": true,
+  "scripts": {
+    "serve": "parcel",
+    "build": "parcel build src/index.html --no-content-hash",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Peter Stadler",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "mirador": "^3.3.0",
+    "mirador-image-tools": "^0.11.0",
+    "parcel-bundler": "^1.12.4"
+  },
+  "devDependencies": {
+    "process": "^0.11.10",
+    "url": "^0.11.1"
+  }
+}
