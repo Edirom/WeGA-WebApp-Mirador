@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "serve": "parcel",
+    "prebuild": "sed -i '' 's+material-ui/core//Menu+material-ui/core/Menu+g' node_modules/mirador/dist/es/src/components/WindowTopMenu.js",
     "build": "parcel build src/index.html --no-content-hash",
     "prezip": "npm run build",
     "zip": "zip -r dist/WeGA-WebApp-Mirador.zip dist/*.js dist/*.map dist/*.html",
@@ -14,10 +15,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "mirador": "^3.3.0",
-    "mirador-image-tools": "^0.11.0",
-    "parcel-bundler": "^1.12.4"
+    "mirador-image-tools": "^0.11.0"
   },
   "devDependencies": {
+    "parcel": "^2.0.0",
     "process": "^0.11.10",
     "url": "^0.11.1"
   }
