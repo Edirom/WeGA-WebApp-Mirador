@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "serve": "parcel",
-    "prebuild": "sed -i '' 's+material-ui/core//Menu+material-ui/core/Menu+g' node_modules/mirador/dist/es/src/components/WindowTopMenu.js",
+    "prebuild": "sed -i'.foo' 's+material-ui/core//Menu+material-ui/core/Menu+g' node_modules/mirador/dist/es/src/components/WindowTopMenu.js",
     "build": "parcel build src/index.html --no-content-hash",
     "prezip": "npm run build",
     "zip": "zip -r dist/WeGA-WebApp-Mirador.zip dist/*.js dist/*.map dist/*.html",
