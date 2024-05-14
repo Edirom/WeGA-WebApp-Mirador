@@ -1,6 +1,6 @@
 {
   "name": "WeGA-Mirador",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha",
   "description": "Dedicated Mirador image viewer for use in the WeGA-WebApp",
   "private": true,
   "scripts": {
