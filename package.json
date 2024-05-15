@@ -3,6 +3,7 @@
   "version": "0.2.0-alpha",
   "description": "Dedicated Mirador image viewer for use in the WeGA-WebApp",
   "private": true,
+  "browserslist": "> 0.2%, last 2 versions, not dead",
   "scripts": {
     "serve": "parcel",
     "prebuild": "sed -i'.foo' 's+material-ui/core//Menu+material-ui/core/Menu+g' node_modules/mirador/dist/es/src/components/WindowTopMenu.js",
