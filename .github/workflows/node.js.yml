@@ -25,7 +25,7 @@ jobs:
     - run: npm run zip --if-present
     
     - name: Upload dist
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: dist
         path: |
