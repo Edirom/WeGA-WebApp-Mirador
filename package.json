@@ -1,12 +1,11 @@
 {
   "name": "WeGA-Mirador",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Dedicated Mirador image viewer for use in the WeGA-WebApp",
   "private": true,
   "browserslist": "> 0.2%, last 2 versions, not dead",
   "scripts": {
     "serve": "parcel",
-    "prebuild": "sed -i'.foo' 's+material-ui/core//Menu+material-ui/core/Menu+g' node_modules/mirador/dist/es/src/components/WindowTopMenu.js",
     "build": "parcel build src/index.html --no-content-hash",
     "prezip": "npm run build",
     "zip": "zip -r dist/WeGA-WebApp-Mirador.zip dist/*.js dist/*.map dist/*.html",
@@ -15,8 +14,8 @@
   "author": "Peter Stadler",
   "license": "Apache-2.0",
   "dependencies": {
-    "mirador": "^3.3.0",
-    "mirador-image-tools": "^0.11.0"
+    "mirador": "^4.0.0",
+    "mirador-image-tools": "^1.0.0"
   },
   "devDependencies": {
     "parcel": "^2.0.0",
