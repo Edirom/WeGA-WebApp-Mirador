@@ -5,6 +5,7 @@
   "private": true,
   "browserslist": "> 0.2%, last 2 versions, not dead",
   "scripts": {
+    "clean": "rm -rf dist .parcel-cache",
     "serve": "parcel",
     "build": "parcel build src/index.html --no-content-hash",
     "prezip": "npm run build",
