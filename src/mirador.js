@@ -3,7 +3,7 @@ import { miradorImageToolsPlugin } from 'mirador-image-tools';
 
 
 class WegaMirador extends HTMLElement {
-    static observedAttributes = ["canvasindexorid", "url"];
+    static observedAttributes = ["canvasindexorid", "lang", "url"];
 
     constructor() {
         // Always call super first in constructor
@@ -12,6 +12,29 @@ class WegaMirador extends HTMLElement {
         // Start Mirador from scratch
         this.viewer = null;
         this._readyDispatched = false;
+        this._config = {
+            // subsetting available languages does not work currently
+            // see https://github.com/ProjectMirador/mirador/issues/3539
+            availableLanguages: {
+                de: "Deutsch",
+                en: "English"
+            },
+            window: {
+                allowClose: true,
+                allowFullscreen: true,
+                sideBarOpenByDefault: false,
+                defaultView: "single",
+                views: [
+                    { key: "single", behaviors: ["individuals", "paged"] },
+                    { key: "book", behaviors: ["paged"] },
+                    { key: "scroll", behaviors: ["continuous"] },
+                    { key: "gallery" }
+                ]
+            },
+            workspace: {
+                showZoomControls: true
+            }
+        }
 
         /*
         Make sure the current element has an id attribute
@@ -23,6 +46,25 @@ class WegaMirador extends HTMLElement {
         }
     }
 
+    // Getter method Mirador config
+    get config() {
+        return this._config || {};
+    }
+
+    // Setter method for altering Mirador config
+    set config(newConfig) {
+        this._config = newConfig;
+
+        // Wenn Viewer bereits existiert, aktualisiere die Config
+        if (this.viewer) {
+            // Mirador unterstützt keine direkte Config-Aktualisierung,
+            // daher müssen wir den Viewer neu initialisieren
+            this.viewer = null;
+            this._readyDispatched = false;
+            this.initViewer(newConfig);
+        }
+    }
+
     connectedCallback() {
         // Check whether the wega-mirador element is visible in the viewport
         // this prevents issues with mis-calculated window sizes when Mirador
@@ -31,7 +73,7 @@ class WegaMirador extends HTMLElement {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !this.viewer) {
                     // initialize viewer when visible
-                    this.initViewer();
+                    this.initViewer(this._config);
 
                     // … and add listener for custom viewer-ready event
                     this.addEventListener('viewer-ready', () => {
@@ -63,7 +105,10 @@ class WegaMirador extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         console.log(`Attribute ${name} has changed.`);
 
-        this[name] = newValue.split(/\s+/);
+        // split into array
+        if(name === 'canvasindexorid' || name === 'url') {
+            this[name] = newValue.split(/\s+/);
+        }
 
         // If the viewer already exists and the canvasindexorid attribute changed,
         // jump to the requested canvas(es).
@@ -78,44 +123,24 @@ class WegaMirador extends HTMLElement {
                 this.goToCanvas(manifest, val).catch(err => console.error('goToCanvas failed', err));
             });
         }
+
+        if (name === "lang") {
+            this.config = { ...this._config, language: newValue}
+        }
     }
 
-    initViewer() {
+    initViewer(options) {
         this.viewer = Mirador.viewer({
+            ...options,
             id: this.id,
-            "themes": {
-                "light": {
-                    "palette": {
-                        "type": "light",
-                        "primary": {
-                            "main": "#0064B4"
-                        }
-                    }
-                }
-            },
-            "window": {
-                "allowClose": true,
-                "allowFullscreen": true,
-                "sideBarOpenByDefault": false,
-                "defaultView": "single",
-                "views": [
-                    { key: "single", behaviors: ["individuals", "paged"] },
-                    { key: "book", behaviors: ["paged"] },
-                    { key: "scroll", behaviors: ["continuous"] },
-                    { key: "gallery" }
-                ]
-            },
-            "workspace": {
-                "showZoomControls": true
-            },
-            "windows":
+            windows:
                 this.url.map(
                     (manifest, index) => ({
-                        "manifestId": manifest,
-                        "id": manifest,
-                        "canvasIndex": this.canvasindexorid[index],
-                        "imageToolsEnabled": true,
-                        "imageToolsOpen": true
+                        manifestId: manifest,
+                        id: manifest,
+                        canvasIndex: this.canvasindexorid[index],
+                        imageToolsEnabled: true,
+                        imageToolsOpen: true
                     })
                 )
         }, [...miradorImageToolsPlugin])
@@ -167,17 +192,19 @@ class WegaMirador extends HTMLElement {
         let canvasId = null;
         const maybeIndex = parseInt(canvasIndexOrId, 10);
 
+        // Get manifest from Mirador's Redux store
+        // to map index number to canvas ID
+        const state = this.viewer.store.getState();
+        const manifest = state.manifests[manifestId].json;
+        //console.debug(manifest);
+        if (!manifest) {
+            return console.error('Manifest not available from viewer store')
+        }
+
         // If a number was provided, fetch the manifest and map index -> id
         if (!Number.isNaN(maybeIndex)) {
             const index = maybeIndex;
             try {
-                // Get manifest from Mirador's Redux store
-                // to map index number to canvas ID
-                const state = this.viewer.store.getState();
-                const manifest = state.manifests[manifestId].json;
-                console.debug(manifest);
-                if (!manifest) { return console.error('Manifest not available from viewer store') }
-
                 // IIIF Presentation API v3
                 if (Array.isArray(manifest.items) && manifest.items[index]) {
                     canvasId = manifest.items[index].id || manifest.items[index]['@id'];
@@ -201,11 +228,16 @@ class WegaMirador extends HTMLElement {
 
         console.log("canvasID: " + canvasId)
 
-        try {
-            this.viewer.store.dispatch(Mirador.actions.setCanvas(manifestId, canvasId));
-        } catch (err) {
-            console.error('Failed to dispatch Mirador setCanvas action', err);
-            throw err;
+        if(canvasId === state.windows?.[manifestId].canvasId) {
+            console.log("No need to update canvas")
+        }
+        else {
+            try {
+                this.viewer.store.dispatch(Mirador.actions.setCanvas(manifestId, canvasId));
+            } catch (err) {
+                console.error('Failed to dispatch Mirador setCanvas action', err);
+                throw err;
+            }
         }
     }
 }
