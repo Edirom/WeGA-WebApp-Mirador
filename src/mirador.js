@@ -124,6 +124,10 @@ class WegaMirador extends HTMLElement {
             });
         }
 
+        if (name === "url") {
+            this.initViewer(this._config);
+        }
+
         if (name === "lang") {
             this.config = { ...this._config, language: newValue}
         }
@@ -134,11 +138,11 @@ class WegaMirador extends HTMLElement {
             ...options,
             id: this.id,
             windows:
-                this.url.map(
+                this.url?.map(
                     (manifest, index) => ({
                         manifestId: manifest,
                         id: manifest,
-                        canvasIndex: this.canvasindexorid[index],
+                        canvasIndex: this.canvasindexorid?.[index],
                         imageToolsEnabled: true,
                         imageToolsOpen: true
                     })
@@ -155,7 +159,7 @@ class WegaMirador extends HTMLElement {
                 // manifests must be present
                 const manifest = state.manifests?.[id];
                 // canvasId must be set
-                const canvasId = state.windows?.[id].canvasId;
+                const canvasId = state.windows?.[id]?.canvasId;
                 // … and no errors
                 return canvasId && manifest && !manifest.error && manifest.json;
             });
@@ -226,13 +230,12 @@ class WegaMirador extends HTMLElement {
             canvasId = canvasIndexOrId;
         }
 
-        console.log("canvasID: " + canvasId)
-
         if(canvasId === state.windows?.[manifestId].canvasId) {
             console.log("No need to update canvas")
         }
         else {
             try {
+                // Finally, dispatch Mirador action to set the canvas
                 this.viewer.store.dispatch(Mirador.actions.setCanvas(manifestId, canvasId));
             } catch (err) {
                 console.error('Failed to dispatch Mirador setCanvas action', err);
