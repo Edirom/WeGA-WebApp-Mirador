@@ -1,4 +1,4 @@
-import Mirador from 'mirador/dist/es/src/index';
+import Mirador from 'Mirador';
 import { miradorImageToolsPlugin } from 'mirador-image-tools';
 
 
