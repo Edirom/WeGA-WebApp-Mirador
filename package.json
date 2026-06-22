@@ -15,7 +15,7 @@
   "author": "Peter Stadler",
   "license": "Apache-2.0",
   "dependencies": {
-    "mirador": "^4.0.0",
+    "mirador": "^4.1.0",
     "mirador-image-tools": "^1.0.0"
   },
   "devDependencies": {
