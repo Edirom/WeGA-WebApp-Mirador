@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "mirador": "^4.2.6",
-    "mirador-image-tools": "^1.0.0"
+    "mirador-image-tools": "^1.0.2"
   },
   "devDependencies": {
     "parcel": "^2.0.0",
